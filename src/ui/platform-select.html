@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokFree</title>
+<link rel="stylesheet" href="design-tokens.css">
+<style>
+  body {
+    height: 100vh; display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(var(--cc-brand-rgb), 0.14), transparent 60%),
+      radial-gradient(800px 500px at 90% 110%, rgba(var(--cc-brand-rgb), 0.08), transparent 60%),
+      var(--cc-bg);
+    user-select: none; overflow: hidden;
+  }
+  .wrap { width: 100%; max-width: 920px; padding: var(--cc-sp-7); text-align: center; }
+
+  /* ===== Hero ===== */
+  .hero-logo {
+    width: 72px; height: 72px; margin: 0 auto var(--cc-sp-5);
+    border-radius: var(--cc-r-xl);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; filter: drop-shadow(0 12px 28px rgba(124,108,255,0.4));
+    animation: floatIn 0.6s var(--cc-ease) both;
+  }
+  .hero-logo svg { display: block; }
+  .hero-title {
+    font-size: 38px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 var(--cc-sp-2);
+    background: linear-gradient(135deg, var(--cc-text-strong) 0%, var(--cc-brand) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    animation: floatIn 0.6s var(--cc-ease) 0.05s both;
+  }
+  .hero-sub {
+    font-size: 15px; color: var(--cc-text-dim); margin: 0 0 var(--cc-sp-3);
+    animation: floatIn 0.6s var(--cc-ease) 0.1s both;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: var(--cc-r-full);
+    background: var(--cc-brand-soft); border: 1px solid rgba(var(--cc-brand-rgb), 0.24);
+    color: var(--cc-brand); font-size: 12px; font-weight: 600;
+    margin-bottom: var(--cc-sp-6);
+    animation: floatIn 0.6s var(--cc-ease) 0.15s both;
+  }
+
+  /* ===== 分区标题 ===== */
+  .section-label {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--cc-text-faint); margin-bottom: var(--cc-sp-4);
+    animation: floatIn 0.6s var(--cc-ease) 0.2s both;
+  }
+
+  /* ===== 平台卡片 ===== */
+  .grid { display: flex; gap: var(--cc-sp-3); justify-content: center; flex-wrap: wrap; }
+  .card {
+    position: relative; width: 168px; padding: var(--cc-sp-5) var(--cc-sp-4);
+    background: var(--cc-bg-elevated); border: 1px solid var(--cc-border);
+    border-radius: var(--cc-r-lg); cursor: pointer;
+    transition: transform var(--cc-dur) var(--cc-ease), border-color var(--cc-dur), box-shadow var(--cc-dur);
+    animation: floatIn 0.5s var(--cc-ease) both;
+  }
+  .card:hover {
+    transform: translateY(-4px); border-color: rgba(var(--cc-brand-rgb), 0.5);
+    box-shadow: var(--cc-glow-brand);
+  }
+  .card:active { transform: translateY(-1px); }
+  .card-logo {
+    width: 52px; height: 52px; margin: 0 auto var(--cc-sp-3);
+    border-radius: var(--cc-r-md); background: var(--cc-surface);
+    display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px;
+  }
+  .card-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .card-logo .fb { font-size: 24px; font-weight: 800; color: var(--cc-brand); }
+  .card-name { font-size: 15px; font-weight: 600; color: var(--cc-text-strong); }
+  .card-desc { font-size: 12px; color: var(--cc-text-dim); margin-top: 4px; }
+  .card.add { border-style: dashed; }
+  .card.add .card-logo { background: var(--cc-brand-soft); }
+  .card .act {
+    position: absolute; top: 8px; width: 22px; height: 22px; line-height: 20px; text-align: center;
+    border: none; border-radius: var(--cc-r-sm); cursor: pointer; font-size: 12px; display: none;
+    background: var(--cc-surface-hover); color: var(--cc-text-dim);
+  }
+  .card:hover .act { display: block; }
+  .act.replace { right: 34px; } .act.delete { right: 8px; }
+  .act:hover { background: var(--cc-brand-soft); color: var(--cc-brand); }
+  .act.delete:hover { background: rgba(248,113,113,0.15); color: var(--cc-danger); }
+
+  /* ===== 底部提示 ===== */
+  .foot-hint {
+    margin-top: var(--cc-sp-7); font-size: 12px; color: var(--cc-text-faint);
+    animation: floatIn 0.6s var(--cc-ease) 0.35s both;
+  }
+  .foot-hint kbd {
+    padding: 2px 7px; border-radius: 5px; background: var(--cc-surface);
+    border: 1px solid var(--cc-border); font-family: var(--cc-mono); font-size: 11px;
+  }
+
+  @keyframes floatIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  /* 亮色态背景微调 */
+  [data-theme="light"] body, .cc-light body { background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(var(--cc-brand-rgb), 0.10), transparent 60%),
+    var(--cc-bg); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero-logo">
+      <svg viewBox="0 0 44 44" width="72" height="72" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tfGradHero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6cff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs><rect width="44" height="44" rx="11" fill="url(#tfGradHero)"/><path d="M9 13.5 H22 V16.8 H17.3 V30.5 H14 V16.8 H9 Z" fill="#fff"/><path d="M25 13.5 H35 V16.8 H28.3 V20.8 H33.5 V24.1 H28.3 V30.5 H25 Z" fill="#fff"/></svg>
+    </div>
+    <h1 class="hero-title">TokFree</h1>
+    <p class="hero-sub">零 Token 成本的 AI Agent 桌面端</p>
+    <div class="hero-badge">⚡ 无需 API Key · 网页版账号即用</div>
+
+    <div class="section-label">选择 AI 平台开始</div>
+    <div id="platform-list" class="grid"></div>
+
+    <div class="foot-hint">选一个平台进入 · 之后所有操作都在右下角悬浮球里 · 按 <kbd>Ctrl</kbd>+<kbd>K</kbd> 唤起命令面板</div>
+  </div>
+
+  <script>
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    async function loadPlatforms() {
+      const listEl = document.getElementById('platform-list');
+      try {
+        const res = await window.electronAPI.listProviders();
+        const providers = (res && res.success && res.providers) || [];
+        if (!providers.length) {
+          listEl.innerHTML = '<div style="color:var(--cc-text-dim);font-size:14px;">暂无可用平台</div>';
+          return;
+        }
+        let i = 0;
+        listEl.innerHTML = providers.map(function (p) {
+          const actions = p.custom
+            ? '<button class="act replace" data-id="' + esc(p.id) + '" title="替换">↻</button>' +
+              '<button class="act delete" data-id="' + esc(p.id) + '" data-path="' + esc(p.path || '') + '" title="删除">×</button>'
+            : '';
+          const delay = (i++ * 0.05).toFixed(2);
+          return '<div class="card" data-id="' + esc(p.id) + '" style="animation-delay:' + delay + 's">' +
+            actions +
+            '<div class="card-logo" data-name="' + esc(p.name) + '"><img src="logos/' + encodeURIComponent(p.id) + '.svg" alt=""></div>' +
+            '<div class="card-name">' + esc(p.name) + '</div>' +
+            '<div class="card-desc">点击进入</div>' +
+          '</div>';
+        }).join('') +
+        '<div class="card add" id="platform-import-card" style="animation-delay:' + (i++ * 0.05).toFixed(2) + 's">' +
+          '<div class="card-logo"><span class="fb">+</span></div>' +
+          '<div class="card-name">导入 Provider</div>' +
+          '<div class="card-desc">选择 JS 文件</div>' +
+        '</div>';
+
+        listEl.querySelectorAll('.card-logo img').forEach(function (img) {
+          img.addEventListener('error', function () {
+            const c = img.parentElement, n = c.getAttribute('data-name') || '?';
+            c.innerHTML = '<span class="fb">' + esc(n.charAt(0).toUpperCase()) + '</span>';
+          });
+        });
+        listEl.querySelectorAll('.card[data-id]').forEach(function (card) {
+          card.addEventListener('click', async function (e) {
+            if (e.target.classList.contains('act')) return;
+            try { await window.electronAPI.selectPlatform(card.dataset.id); }
+            catch (err) { toast('进入失败: ' + (err && err.message || err)); }
+          });
+        });
+        listEl.querySelectorAll('.act.delete').forEach(function (btn) {
+          btn.addEventListener('click', async function (e) {
+            e.stopPropagation();
+            if (!btn.dataset.path) return;
+            if (!confirm('确定删除这个自定义 Provider 吗？')) return;
+            try {
+              const r = await window.electronAPI.removeProvider(btn.dataset.path, btn.dataset.id);
+              if (r && r.success) await loadPlatforms(); else toast('删除失败');
+            } catch (err) { toast('删除失败: ' + (err.message || err)); }
+          });
+        });
+        listEl.querySelectorAll('.act.replace').forEach(function (btn) {
+          btn.addEventListener('click', async function (e) {
+            e.stopPropagation();
+            try {
+              const r = await window.electronAPI.replaceProvider(btn.dataset.id);
+              if (r && r.success) await loadPlatforms();
+            } catch (err) { toast('替换失败: ' + (err.message || err)); }
+          });
+        });
+        const imp = document.getElementById('platform-import-card');
+        if (imp) imp.addEventListener('click', async function () {
+          try {
+            const r = await window.electronAPI.importProvider();
+            if (r && r.success) await loadPlatforms();
+          } catch (err) { toast('导入失败: ' + (err.message || err)); }
+        });
+      } catch (err) {
+        listEl.innerHTML = '<div style="color:var(--cc-danger);font-size:14px;">加载失败: ' + esc(err && err.message || err) + '</div>';
+      }
+    }
+
+    // 应用内轻提示（替代廉价 alert）
+    function toast(msg) {
+      const t = document.createElement('div');
+      t.textContent = msg;
+      t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);' +
+        'padding:10px 18px;border-radius:12px;background:var(--cc-bg-elevated);color:var(--cc-text);' +
+        'border:1px solid var(--cc-border);box-shadow:var(--cc-shadow-md);font-size:13px;z-index:99;' +
+        'animation:floatIn .24s var(--cc-ease)';
+      document.body.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 300); }, 2600);
+    }
+
+    if (window.electronAPI && window.electronAPI.listProviders) {
+      loadPlatforms();
+    } else {
+      setTimeout(function () {
+        if (window.electronAPI && window.electronAPI.listProviders) loadPlatforms();
+        else document.getElementById('platform-list').innerHTML = '<div style="color:var(--cc-danger);">API 未就绪，请重启应用</div>';
+      }, 500);
+    }
+  </script>
+</body>
+</html>

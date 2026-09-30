@@ -1,0 +1,79 @@
+/**
+ * TokFree — 统一设计系统（Design Tokens）
+ * 所有 UI（首屏/覆盖层/面板/对话框）必须引用这里的变量，禁止散落硬编码颜色。
+ * 品牌色：Violet（紫罗兰）—— 与"AI / 科技 / 高级"气质契合，暗浅两态一致。
+ */
+:root {
+  /* ===== 品牌色 ===== */
+  --cc-brand: #7c6cff;
+  --cc-brand-strong: #6a58ff;
+  --cc-brand-soft: rgba(124, 108, 255, 0.12);
+  --cc-brand-rgb: 124, 108, 255;
+  --cc-brand-gradient: linear-gradient(135deg, #7c6cff 0%, #a78bfa 100%);
+
+  /* ===== 中性色（暗色为默认）===== */
+  --cc-bg: #0e0f1a;
+  --cc-bg-elevated: #161827;
+  --cc-surface: rgba(255, 255, 255, 0.045);
+  --cc-surface-hover: rgba(255, 255, 255, 0.08);
+  --cc-border: rgba(255, 255, 255, 0.09);
+  --cc-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* ===== 文字 ===== */
+  --cc-text: #e6e8f5;
+  --cc-text-strong: #ffffff;
+  --cc-text-dim: #9298b8;
+  --cc-text-faint: #5d6280;
+
+  /* ===== 语义色 ===== */
+  --cc-success: #4ade80;
+  --cc-warning: #fbbf24;
+  --cc-danger: #f87171;
+  --cc-info: #60a5fa;
+
+  /* ===== 间距（8pt 栅格）===== */
+  --cc-sp-1: 4px;  --cc-sp-2: 8px;  --cc-sp-3: 12px; --cc-sp-4: 16px;
+  --cc-sp-5: 24px; --cc-sp-6: 32px; --cc-sp-7: 48px; --cc-sp-8: 64px;
+
+  /* ===== 圆角 ===== */
+  --cc-r-sm: 8px; --cc-r-md: 12px; --cc-r-lg: 16px; --cc-r-xl: 24px; --cc-r-full: 999px;
+
+  /* ===== 阴影 ===== */
+  --cc-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.24);
+  --cc-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.32);
+  --cc-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.48);
+  --cc-glow-brand: 0 0 0 1px rgba(var(--cc-brand-rgb), 0.24), 0 12px 40px rgba(var(--cc-brand-rgb), 0.24);
+
+  /* ===== 动效 ===== */
+  --cc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cc-dur-fast: 0.16s; --cc-dur: 0.24s; --cc-dur-slow: 0.4s;
+
+  /* ===== 字体 ===== */
+  --cc-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --cc-mono: "SF Mono", "JetBrains Mono", Consolas, monospace;
+}
+
+/* 亮色态 */
+[data-theme="light"], .cc-light {
+  --cc-bg: #f7f7fb;
+  --cc-bg-elevated: #ffffff;
+  --cc-surface: rgba(0, 0, 0, 0.03);
+  --cc-surface-hover: rgba(0, 0, 0, 0.06);
+  --cc-border: rgba(0, 0, 0, 0.08);
+  --cc-border-strong: rgba(0, 0, 0, 0.16);
+  --cc-text: #1a1c2e;
+  --cc-text-strong: #0a0b14;
+  --cc-text-dim: #6b7089;
+  --cc-text-faint: #9ca1b8;
+  --cc-brand: #6a58ff;
+  --cc-brand-strong: #5544ee;
+  --cc-brand-soft: rgba(106, 88, 255, 0.10);
+  --cc-brand-rgb: 106, 88, 255;
+  --cc-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --cc-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --cc-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== 基础重置 ===== */
+*, *::before, *::after { box-sizing: border-box; }
+body.cc { margin: 0; font-family: var(--cc-font); background: var(--cc-bg); color: var(--cc-text); -webkit-font-smoothing: antialiased; }

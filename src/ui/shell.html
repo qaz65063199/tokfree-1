@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+<title>TokFree</title>
+<link rel="stylesheet" href="shell.css">
+</head>
+<body>
+<div id="app">
+  <aside id="left-bar">
+    <div class="lb-brand">
+      <svg width="28" height="28" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tfGrad1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6cff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs><rect width="44" height="44" rx="11" fill="url(#tfGrad1)"/><path d="M9 13.5 H22 V16.8 H17.3 V30.5 H14 V16.8 H9 Z" fill="#fff"/><path d="M25 13.5 H35 V16.8 H28.3 V20.8 H33.5 V24.1 H28.3 V30.5 H25 Z" fill="#fff"/></svg>
+      <span class="lb-brand-name">TokFree</span>
+    </div>
+
+    <div class="lb-section-header">
+      <span>会话</span>
+      <div class="lb-section-actions">
+        <button id="lb-btn-new-session" class="lb-mini-btn" title="新增会话（新对话并初始化项目）">＋ 新增</button>
+        <button id="lb-btn-refresh-sessions" class="lb-mini-btn" title="刷新会话列表">刷新</button>
+      </div>
+    </div>
+    <div class="lb-session-search">
+      <input id="lb-session-search-input" class="lb-session-search-input" type="search" placeholder="搜索会话…" autocomplete="off" spellcheck="false" />
+    </div>
+    <div id="lb-multi-bar" class="lb-multi-bar lb-hidden">
+      <span id="lb-multi-count" class="lb-multi-count">已选 0</span>
+      <button id="lb-multi-del" class="lb-mini-btn lb-mini-danger">删除</button>
+      <button id="lb-multi-cancel" class="lb-mini-btn">取消</button>
+    </div>
+    <div id="lb-session-list" class="lb-session-list">
+      <div class="lb-session-empty">暂无会话</div>
+    </div>
+
+    <div class="lb-spacer"></div>
+
+    <div class="lb-bottom">
+      <div class="lb-bottom-btns">
+        <button id="lb-btn-settings" class="lb-bottom-btn" title="设置">设置</button>
+      </div>
+    </div>
+  </aside>
+
+  <div id="main-area">
+    <div id="tab-bar">
+      <div id="tab-list"></div>
+      <button id="new-tab-btn" title="新建标签（Ctrl+T）">+</button>
+      <button id="view-toggle-btn" title="在 Agent 界面与网页界面之间切换">查看网页</button>
+    </div>
+    <div id="webview-container">
+      <!-- Agent 风格对话视图：盖在 webview 上方（网页照常运行，只是不直接展示） -->
+      <div id="chat-view" class="cv-hidden">
+        <div class="cv-header">
+          <div class="cv-title-wrap">
+            <span id="cv-title" class="cv-title">当前对话</span>
+            <span id="cv-account" class="cv-account"></span>
+          </div>
+          <div class="cv-header-actions">
+            <button id="cv-btn-new" class="cv-btn" title="开启新对话">＋ 新对话</button>
+          </div>
+        </div>
+        <div id="cv-loading-banner" class="cv-init-banner cv-hidden">
+          <span class="cv-init-text">页面加载中，请稍候…</span>
+        </div>
+        <div id="cv-login-banner" class="cv-init-banner cv-login-banner cv-hidden">
+          <span class="cv-init-text">请先登录账号后使用 Agent 界面</span>
+          <button id="cv-btn-gologin" class="cv-btn cv-btn-primary">去登录</button>
+        </div>
+        <div id="cv-init-banner" class="cv-init-banner cv-hidden">
+          <span class="cv-init-text">尚未初始化项目目录，AI 无法读写你的文件。</span>
+          <button id="cv-btn-init" class="cv-btn cv-btn-primary">初始化项目</button>
+        </div>
+        <div id="cv-apiconfig" class="cv-apiconfig cv-hidden">
+          <label class="cv-apiconfig-item">Base URL
+            <input id="cv-apiconfig-baseurl" type="text" spellcheck="false" autocomplete="off">
+          </label>
+          <label class="cv-apiconfig-item">AuthKey
+            <input id="cv-apiconfig-authkey" type="password" spellcheck="false" autocomplete="off">
+          </label>
+          <label class="cv-apiconfig-item">模型
+            <select id="cv-apiconfig-model"></select>
+          </label>
+          <button id="cv-apiconfig-refresh" class="cv-btn" type="button" title="重新拉取模型列表">刷新模型</button>
+          <label class="cv-apiconfig-item cv-apiconfig-check">
+            <input id="cv-apiconfig-image" type="checkbox"> 生图
+          </label>
+        </div>
+        <div id="cv-messages" class="cv-messages">
+          <div id="cv-empty" class="cv-empty">
+            <div class="cv-empty-icon"><svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tfGrad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6cff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs><rect width="44" height="44" rx="11" fill="url(#tfGrad2)"/><path d="M9 13.5 H22 V16.8 H17.3 V30.5 H14 V16.8 H9 Z" fill="#fff"/><path d="M25 13.5 H35 V16.8 H28.3 V20.8 H33.5 V24.1 H28.3 V30.5 H25 Z" fill="#fff"/></svg></div>
+            <div>向 AI 下达任务，开始工作吧</div>
+            <div class="cv-empty-sub">思考过程与执行步骤会实时展示在这里</div>
+            <div class="cv-empty-examples">
+              <div class="cv-empty-examples-title">试试这样问：</div>
+              <button class="cv-example" type="button">这个项目是做什么的？</button>
+              <button class="cv-example" type="button">帮我看看代码有什么问题</button>
+              <button class="cv-example" type="button">给项目写一份 README</button>
+              <button class="cv-example" type="button">帮我跑一下测试</button>
+            </div>
+          </div>
+        </div>
+        <div id="cv-running-bar" class="cv-running-bar cv-hidden">
+          <span class="cv-running-spin"></span>AI 正在运行中…
+        </div>
+        <div id="cv-attachments" class="cv-attachments cv-hidden"></div>
+        <div id="cv-policy-bar" class="cv-policy-bar">
+          <span class="cv-policy-label">本标签</span>
+          <button id="cv-policy-mode" class="cv-policy-btn" title="点击切换 Plan/Act 模式（仅本标签）">模式：Act</button>
+          <label class="cv-policy-trust" title="仅本标签：勾选后本标签危险操作免确认">
+            <input type="checkbox" id="cv-policy-trust" /> 信任模式（危险操作免确认）
+          </label>
+        </div>
+        <div class="cv-input-row">
+          <div class="cv-input-wrap">
+            <textarea id="cv-input" rows="3" placeholder="输入任务或补充说明，输入 @ 可引用项目文件（Enter 发送，Shift+Enter 换行）"></textarea>
+            <div id="cv-at-menu" class="cv-at-menu cv-hidden"></div>
+          </div>
+          <button id="cv-attach" class="cv-btn" title="上传附件">📎</button>
+          <button id="cv-deepthink" class="cv-btn cv-hidden" title="深度思考（与网页端同步）">💭 深度思考</button>
+          <div class="cv-btn-col">
+            <button id="cv-stop" class="cv-btn cv-btn-stop cv-hidden" title="停止 AI 生成">■ 停止</button>
+            <button id="cv-send" class="cv-btn cv-btn-primary">发送</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside id="right-bar">
+    <div class="rb-scroll">
+      <div class="rb-section rb-project-section">
+        <div class="rb-row">
+          <span class="rb-label">当前项目目录</span>
+          <button id="rb-btn-change-dir" class="rb-btn-mini" title="修改项目目录">修改</button>
+        </div>
+        <div id="rb-project-dir" class="rb-dir-path" title="">未选择</div>
+      </div>
+      <div class="rb-section rb-token-section">
+        <div class="rb-row">
+          <span class="rb-label" title="本次对话累计消耗的 Token 数（服务端统计）">对话 Token</span>
+          <span id="rb-token-count" class="rb-token-count">0</span>
+        </div>
+      </div>
+      <div class="rb-section rb-compact-section">
+        <button id="rb-btn-compact" class="rb-btn rb-btn-secondary" title="压缩上下文：生成摘要并分享最近对话，在新会话继续">压缩上下文</button>
+        <label class="rb-toggle-label" title="对话过长时自动生成摘要并开新对话，避免超出上下文上限"><input type="checkbox" id="rb-auto-compact-enabled" /> 自动压缩上下文</label>
+        <div class="rb-row">
+          <span class="rb-label" title="对话 Token 超过此值时触发自动压缩">触发阈值（万 token）</span>
+          <input id="rb-auto-compact-threshold" class="rb-compact-threshold" type="number" min="1" step="1" value="80" />
+        </div>
+        <div class="rb-compact-note">压缩后会自动开新对话并承接上下文，请耐心等待。</div>
+      </div>
+      <div class="rb-section rb-exec-section">
+        <div class="rb-row">
+          <span class="rb-label">AI 状态</span>
+          <span id="rb-exec-status" class="rb-exec-status rb-exec-idle">空闲</span>
+        </div>
+      </div>
+      <div class="rb-section">
+        <label class="rb-toggle-label"><input type="checkbox" id="rb-team-mode" /> 多 Agent 模式</label>
+        <label class="rb-toggle-label"><input type="checkbox" id="rb-dev-mode" /> 开发者模式（显示思考与工具过程）</label>
+      </div>
+      <div class="rb-actions">
+        <button id="rb-btn-theme" class="rb-btn rb-btn-secondary" title="切换亮色/暗色主题">主题切换</button>
+      </div>
+      <div class="rb-actions">
+        <button id="rb-btn-quick-login" class="rb-btn rb-btn-primary rb-hidden" title="用账号池中的账号一键登录">一键登录</button>
+        <button id="rb-btn-init" class="rb-btn rb-btn-primary">初始化项目</button>
+        <button id="rb-btn-window-manager" class="rb-btn rb-btn-secondary" title="管理窗口（新建/切换）">窗口管理</button>
+        <button id="rb-btn-mcp" class="rb-btn rb-btn-secondary" title="管理 MCP 工具">MCP</button>
+        <button id="rb-btn-knowledge" class="rb-btn rb-btn-secondary" title="管理知识库：技能与全局偏好">知识库</button>
+        <button id="rb-btn-account-pool" class="rb-btn rb-btn-secondary" title="管理账号池：集中管理账号密码，供窗口复用">账号池</button>
+      </div>
+      <div class="rb-divider"></div>
+      <div class="rb-actions">
+        <button id="rb-btn-gen-doc" class="rb-btn rb-btn-primary" title="让 AI 生成项目说明文档 (TOKFREE.md)">生成项目说明</button>
+        <button id="rb-btn-manual-parse" class="rb-btn rb-btn-secondary" title="AI 卡住/停顿时点这里，发送“继续”指令催它往下做">卡住了？点我</button>
+      </div>
+      <div class="rb-divider"></div>
+      <div class="rb-actions">
+        <button id="rb-btn-usage" class="rb-btn rb-btn-secondary" title="查看 Token 使用统计">使用统计</button>
+      </div>
+      <div class="rb-divider"></div>
+      <div class="rb-section">
+        <div class="rb-label">补充说明（AI 忙时自动排队，随回执一起发）</div>
+        <textarea id="rb-user-input" class="rb-textarea" rows="3" placeholder="输入内容，回车或点发送"></textarea>
+        <div class="rb-row rb-row-end">
+          <span id="rb-user-hint" class="rb-hint"></span>
+          <button id="rb-btn-user-send" class="rb-btn rb-btn-primary rb-btn-inline">发送</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+<!-- ===== 启动加载遮罩（恢复标签期间显示，禁止操作，加载完自动消失） ===== -->
+<div id="boot-mask" class="boot-mask boot-hidden">
+  <div class="boot-card">
+    <div class="boot-logo"><svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tfGradBoot" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c6cff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs><rect width="44" height="44" rx="11" fill="url(#tfGradBoot)"/><path d="M9 13.5 H22 V16.8 H17.3 V30.5 H14 V16.8 H9 Z" fill="#fff"/><path d="M25 13.5 H35 V16.8 H28.3 V20.8 H33.5 V24.1 H28.3 V30.5 H25 Z" fill="#fff"/></svg></div>
+    <div class="boot-title">正在加载标签</div>
+    <div id="boot-status" class="boot-status">正在加载 0/0 个标签</div>
+    <div class="boot-bar"><div id="boot-bar-fill" class="boot-bar-fill" style="width:0%"></div></div>
+    <div id="boot-errors" class="boot-errors boot-hidden"></div>
+    <div id="boot-actions" class="boot-actions boot-hidden">
+      <button id="boot-btn-retry" class="boot-btn boot-btn-secondary">重试</button>
+      <button id="boot-btn-continue" class="boot-btn boot-btn-primary">继续</button>
+    </div>
+  </div>
+</div>
+<!-- ===== 全局窗口管理浮层（壳层级，跨标签共享，切标签不消失） ===== -->
+<!-- ===== 平台选择浮层（壳层级，点 + 新建标签时弹出） ===== -->
+<div id="usage-mask" class="usage-mask usage-hidden">
+  <div class="usage-panel">
+    <div class="usage-header">
+      <span class="usage-title">使用统计</span>
+      <button id="usage-close" class="usage-close" title="关闭">✕</button>
+    </div>
+    <div class="usage-body">
+      <div class="rb-usage-head">
+        <span class="rb-label">统计范围</span>
+        <div class="rb-usage-range" id="rb-usage-range">
+          <button type="button" class="rb-usage-range-btn active" data-range="7">近 7 日</button>
+          <button type="button" class="rb-usage-range-btn" data-range="30">近 30 日</button>
+        </div>
+      </div>
+      <div id="rb-usage-kpi" class="rb-usage-kpi"></div>
+      <div class="rb-usage-block">
+        <div class="rb-usage-block-head">
+          <span class="rb-usage-block-title">Token 活动</span>
+          <div class="rb-usage-tabs" id="rb-usage-activity-tabs">
+            <button type="button" class="rb-usage-tab" data-mode="daily">每日</button>
+            <button type="button" class="rb-usage-tab" data-mode="weekly">每周</button>
+            <button type="button" class="rb-usage-tab active" data-mode="cumulative">累计</button>
+          </div>
+        </div>
+        <div id="rb-usage-heatmap" class="rb-usage-heatmap"></div>
+        <div id="rb-usage-heatmap-axis" class="rb-usage-heatmap-axis"></div>
+      </div>
+      <div class="rb-usage-block">
+        <div class="rb-usage-block-head">
+          <span class="rb-usage-block-title">每日 Token 趋势</span>
+        </div>
+        <div id="rb-usage-trend" class="rb-usage-trend"></div>
+      </div>
+      <div class="rb-usage-block">
+        <div class="rb-usage-block-head">
+          <span class="rb-usage-block-title">窗口用量</span>
+        </div>
+        <div id="rb-usage-donut" class="rb-usage-donut"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="psm-mask" class="swm-mask swm-hidden">
+  <div class="swm-panel psm-panel">
+    <div class="swm-header">
+      <span class="swm-title">选择平台</span>
+      <button id="psm-close" class="swm-icon-btn" title="关闭">✕</button>
+    </div>
+    <div class="swm-body">
+      <div id="psm-list" class="psm-grid"></div>
+    </div>
+  </div>
+</div>
+<div id="swm-mask" class="swm-mask swm-hidden">
+  <div id="swm-panel" class="swm-panel">
+    <div class="swm-header" id="swm-header">
+      <span class="swm-title">窗口管理</span>
+      <div class="swm-header-actions">
+        <button id="swm-refresh" class="swm-icon-btn" title="刷新窗口列表">刷新</button>
+        <button id="swm-close" class="swm-icon-btn" title="关闭">✕</button>
+      </div>
+    </div>
+    <div class="swm-body">
+      <div class="swm-actions">
+        <button id="swm-new-window" class="swm-btn swm-btn-primary">新建窗口</button>
+      </div>
+
+      <!-- 看门狗区 -->
+      <div class="swm-section">
+        <div class="swm-section-header">
+          <span class="swm-label">看门狗（AI 生命监护）</span>
+          <span id="swm-wd-state" class="swm-wd-state">…</span>
+        </div>
+        <div class="swm-row">
+          <button id="swm-wd-toggle" class="swm-btn">暂停</button>
+          <button id="swm-wd-wake" class="swm-btn">立即唤醒</button>
+          <button id="swm-wd-refresh" class="swm-btn">刷新</button>
+        </div>
+      </div>
+
+      <!-- 窗口状态概览 -->
+      <div id="swm-overview" class="swm-overview"></div>
+
+      <!-- 窗口列表 -->
+      <div class="swm-section">
+        <div class="swm-section-header">
+          <span class="swm-label">窗口列表</span>
+        </div>
+        <div class="swm-hint">点击列表项可切换/聚焦对应标签。本面板是全局浮层，切换标签不会消失。</div>
+        <div id="swm-list" class="swm-list">
+          <div class="swm-empty">加载中…</div>
+        </div>
+      </div>
+
+      <!-- 运行统计 -->
+      <div class="swm-section">
+        <div class="swm-section-header">
+          <span class="swm-label">运行统计</span>
+          <button id="swm-stats-log-btn" class="swm-icon-btn" title="展开/收起最近 50 条事件日志">查看日志</button>
+        </div>
+        <div id="swm-stats-summary" class="swm-stats-summary">—</div>
+        <div id="swm-stats-list" class="swm-stats-list"><div class="swm-empty">暂无数据</div></div>
+        <span class="swm-label">最近活动</span>
+        <div id="swm-stats-events" class="swm-stats-events"></div>
+        <div id="swm-stats-log" class="swm-stats-log swm-hidden"></div>
+      </div>
+
+      <!-- 数据看板（借鉴 Mastra Dashboard：token 统计 + 任务指标，不含成本估算） -->
+      <div class="swm-section">
+        <div class="swm-section-header">
+          <span class="swm-label">数据看板</span>
+          <button id="swm-db-refresh" class="swm-icon-btn" title="刷新数据看板">刷新</button>
+        </div>
+        <div id="swm-db-kpi" class="swm-db-kpi"><div class="swm-empty">加载中…</div></div>
+        <div class="swm-db-sub">Token 趋势（近 7 天）</div>
+        <canvas id="swm-db-chart" class="swm-db-chart" width="360" height="120"></canvas>
+        <div class="swm-db-sub">各窗口用量对比</div>
+        <div id="swm-db-table" class="swm-db-table"><div class="swm-empty">暂无数据</div></div>
+      </div>
+
+      <!-- 窗口设置面板（默认隐藏，点窗口的 ⚙ 后展开） -->
+      <div id="swm-profile-config" class="swm-section swm-hidden">
+        <div class="swm-section-header">
+          <span class="swm-label">窗口设置：<span id="swm-cfg-name"></span></span>
+          <button id="swm-cfg-close" class="swm-icon-btn" title="收起">✕</button>
+        </div>
+        <div class="swm-cfg-tabs">
+          <button class="swm-cfg-tab swm-cfg-tab-active" data-tab="account">账号</button>
+          <button class="swm-cfg-tab" data-tab="proxy">代理</button>
+          <button class="swm-cfg-tab" data-tab="fingerprint">指纹</button>
+        </div>
+        <div class="swm-cfg-pane" data-pane="account">
+          <input id="swm-cfg-acct-label" class="swm-input" placeholder="账号标签（如 账号A）" />
+          <input id="swm-cfg-acct-email" class="swm-input" placeholder="邮箱 / 登录名（可选）" />
+          <input id="swm-cfg-acct-group" class="swm-input" placeholder="分组（如 工作）" />
+          <div class="swm-row">
+            <select id="swm-cfg-acct-status" class="swm-input">
+              <option value="active">正常</option>
+              <option value="limited">限流</option>
+              <option value="expired">过期</option>
+              <option value="disabled">停用</option>
+            </select>
+            <input id="swm-cfg-acct-quota" type="number" class="swm-input" placeholder="配额上限（0=不限）" />
+          </div>
+          <button id="swm-cfg-acct-save" class="swm-btn swm-btn-primary">保存账号</button>
+          <div class="swm-hint">绑定账号池账号（自动登录用）：</div>
+          <select id="swm-cfg-acct-bind" class="swm-input"></select>
+          <div class="swm-actions">
+            <button id="swm-cfg-acct-relogin" class="swm-btn">立即重登</button>
+          </div>
+        </div>
+        <div class="swm-cfg-pane swm-hidden" data-pane="proxy">
+          <div class="swm-hint">直接粘贴代理地址，自动识别（推荐）：</div>
+          <input id="swm-cfg-proxy-paste" class="swm-input" placeholder="socks5://user:pass@1.2.3.4:1080 或 1.2.3.4:8080" />
+          <div class="swm-actions">
+            <button id="swm-cfg-proxy-parse" class="swm-btn">解析填入</button>
+          </div>
+          <label class="swm-check"><input type="checkbox" id="swm-cfg-proxy-enabled" /> 启用代理（需重启窗口生效）</label>
+          <div class="swm-row">
+            <select id="swm-cfg-proxy-protocol" class="swm-input">
+              <option value="http">HTTP</option>
+              <option value="https">HTTPS</option>
+              <option value="socks5">SOCKS5</option>
+            </select>
+            <input id="swm-cfg-proxy-host" class="swm-input" placeholder="主机" />
+            <input id="swm-cfg-proxy-port" type="number" class="swm-input" placeholder="端口" />
+          </div>
+          <div class="swm-row">
+            <input id="swm-cfg-proxy-user" class="swm-input" placeholder="用户名（可选）" />
+            <input id="swm-cfg-proxy-pass" type="password" class="swm-input" placeholder="密码（可选）" />
+          </div>
+          <div class="swm-actions">
+            <button id="swm-cfg-proxy-test" class="swm-btn">测试连通</button>
+            <button id="swm-cfg-proxy-save" class="swm-btn swm-btn-primary">保存代理</button>
+          </div>
+          <div id="swm-cfg-proxy-result" class="swm-hint"></div>
+        </div>
+        <div class="swm-cfg-pane swm-hidden" data-pane="fingerprint">
+          <div class="swm-hint">点一下自动生成一套完整虚拟身份（系统/时区/语言/CPU/屏幕/显卡）：</div>
+          <button id="swm-cfg-fp-random" class="swm-btn swm-btn-primary">一键生成随机身份</button>
+          <div id="swm-cfg-fp-card" class="swm-cfg-card">尚未生成身份</div>
+          <label class="swm-check"><input type="checkbox" id="swm-cfg-fp-enabled" /> 启用指纹伪装（需重启窗口生效）</label>
+          <div class="swm-row">
+            <select id="swm-cfg-fp-os" class="swm-input">
+              <option value="">跟随系统</option>
+              <option value="win">Windows</option>
+              <option value="mac">macOS</option>
+              <option value="linux">Linux</option>
+            </select>
+            <input id="swm-cfg-fp-tz" class="swm-input" placeholder="时区（如 Asia/Shanghai）" />
+          </div>
+          <div class="swm-row">
+            <input id="swm-cfg-fp-lang" class="swm-input" placeholder="语言（如 zh-CN）" />
+            <input id="swm-cfg-fp-cores" type="number" class="swm-input" placeholder="CPU 核数" />
+          </div>
+          <div class="swm-row">
+            <input id="swm-cfg-fp-sw" type="number" class="swm-input" placeholder="屏宽" />
+            <input id="swm-cfg-fp-sh" type="number" class="swm-input" placeholder="屏高" />
+          </div>
+          <div class="swm-actions">
+            <button id="swm-cfg-fp-reseed" class="swm-btn">换新身份（重随机 seed）</button>
+            <button id="swm-cfg-fp-save" class="swm-btn swm-btn-primary">保存并应用（需重启窗口）</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 全局 MCP 管理浮层（壳层级，跨标签共享，切标签不消失） ===== -->
+<div id="smcp-mask" class="swm-mask swm-hidden">
+  <div id="smcp-panel" class="swm-panel smcp-panel">
+    <div class="swm-header" id="smcp-header">
+      <span class="swm-title">MCP 工具</span>
+      <div class="swm-header-actions">
+        <button id="smcp-refresh" class="swm-icon-btn" title="刷新 MCP server 列表">刷新</button>
+        <button id="smcp-close" class="swm-icon-btn" title="关闭">✕</button>
+      </div>
+    </div>
+    <div class="swm-body smcp-body">
+      <div class="smcp-left">
+        <div class="smcp-header-row">
+          <span class="smcp-label">已配置</span>
+        </div>
+        <div id="smcp-list" class="smcp-list">
+          <div class="swm-empty">加载中…</div>
+        </div>
+      </div>
+      <div class="smcp-right">
+        <textarea id="smcp-json" class="smcp-json" rows="14" spellcheck="false" placeholder='{&#10;  "mcpServers": {&#10;    "filesystem": {&#10;      "command": "npx",&#10;      "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:/my-project"]&#10;    }&#10;  }&#10;}'></textarea>
+        <div class="swm-actions">
+          <button id="smcp-save" type="button" class="swm-btn swm-btn-primary">保存配置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 全局账号池浮层（壳层级，跨标签共享，切标签不消失） ===== -->
+<div id="sap-mask" class="swm-mask swm-hidden">
+  <div id="sap-panel" class="swm-panel sap-panel">
+    <div class="swm-header" id="sap-header">
+      <span class="swm-title">账号池</span>
+      <div class="swm-header-actions">
+        <button id="sap-refresh" class="swm-icon-btn" title="刷新账号列表">刷新</button>
+        <button id="sap-close" class="swm-icon-btn" title="关闭">✕</button>
+      </div>
+    </div>
+    <div class="swm-body sap-body">
+      <div class="sap-left">
+        <div class="smcp-header-row">
+          <span class="smcp-label">账号列表</span>
+        </div>
+        <div id="sap-list" class="smcp-list">
+          <div class="swm-empty">加载中…</div>
+        </div>
+      </div>
+      <div class="sap-right">
+        <div id="sap-empty" class="sap-hint">左侧选择账号以编辑，或直接填写下方表单新建</div>
+        <input id="sap-label" class="sap-input" placeholder="账号标签（如 账号A）" />
+        <input id="sap-username" class="sap-input" placeholder="登录名 / 邮箱" />
+        <input id="sap-password" type="password" class="sap-input" placeholder="密码（留空则不修改；本地加密存储）" />
+        <div class="sap-row">
+          <input id="sap-provider" class="sap-input" placeholder="平台（如 deepseek）" />
+          <input id="sap-group" class="sap-input" placeholder="分组（可选）" />
+        </div>
+        <textarea id="sap-note" class="sap-note" rows="3" placeholder="备注（可选）"></textarea>
+        <div class="swm-actions">
+          <button id="sap-save" type="button" class="swm-btn swm-btn-primary">保存</button>
+          <button id="sap-new" type="button" class="swm-btn">新建</button>
+        </div>
+        <div class="swm-actions">
+          <button id="sap-delete" type="button" class="swm-btn swm-btn-danger swm-hidden">删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 全局知识库浮层（壳层级，跨标签共享，切标签不消失） ===== -->
+<div id="skm-mask" class="swm-mask swm-hidden">
+  <div id="skm-panel" class="swm-panel skm-panel">
+    <div class="swm-header" id="skm-header">
+      <span class="swm-title">知识库</span>
+      <div class="swm-header-actions">
+        <button id="skm-refresh" class="swm-icon-btn" title="刷新技能列表">刷新</button>
+        <button id="skm-close" class="swm-icon-btn" title="关闭">✕</button>
+      </div>
+    </div>
+    <div class="swm-body skm-body">
+      <div class="skm-left">
+        <div class="smcp-header-row">
+          <span class="smcp-label">技能列表</span>
+          <span id="skm-project-dir" class="skm-dir" title="当前活动标签的项目目录"></span>
+        </div>
+        <div id="skm-list" class="smcp-list">
+          <div class="swm-empty">加载中…</div>
+        </div>
+      </div>
+      <div class="skm-right">
+        <div id="skm-empty" class="sap-hint">左侧选择技能以查看/编辑正文，或直接新建</div>
+        <input id="skm-name" class="sap-input skm-hidden" placeholder="技能名（字母/数字/下划线/连字符）" />
+        <textarea id="skm-content" class="smcp-json" rows="10" placeholder="技能正文（Markdown）"></textarea>
+        <div class="swm-actions">
+          <button id="skm-save" type="button" class="swm-btn swm-btn-primary skm-hidden">保存技能</button>
+          <button id="skm-versions" type="button" class="swm-btn skm-hidden">版本历史</button>
+          <button id="skm-create" type="button" class="swm-btn">新建技能</button>
+        </div>
+        <div id="skm-versions-box" class="skm-versions skm-hidden"></div>
+        <div class="swm-actions">
+          <button id="skm-toggle-project" type="button" class="swm-btn skm-hidden">本项目启用</button>
+          <button id="skm-toggle-global" type="button" class="swm-btn skm-hidden">全局启用</button>
+          <button id="skm-delete" type="button" class="swm-btn skm-btn-danger skm-hidden">删除</button>
+        </div>
+        <div class="skm-divider"></div>
+        <div class="smcp-header-row"><span class="smcp-label">全局偏好（跨项目生效）</span></div>
+        <textarea id="skm-pref" class="smcp-json" rows="5" placeholder="全局偏好（Markdown）"></textarea>
+        <div class="swm-actions">
+          <button id="skm-pref-save" type="button" class="swm-btn swm-btn-primary">保存偏好</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 全局设置弹窗（壳层级，跨标签共享，切标签不消失） ===== -->
+<div id="ssm-mask" class="swm-mask swm-hidden">
+  <div id="ssm-panel" class="swm-panel ssm-panel">
+    <div class="swm-header" id="ssm-header">
+      <span class="swm-title">设置</span>
+      <div class="swm-header-actions">
+        <button id="ssm-save" class="swm-icon-btn" title="保存设置">保存</button>
+        <button id="ssm-close" class="swm-icon-btn" title="关闭">✕</button>
+      </div>
+    </div>
+    <div class="swm-body ssm-body">
+
+      <div class="swm-section">
+        <span class="swm-label">工具模式</span>
+        <button id="ssm-policy-mode" class="swm-btn" title="点击切换 Plan/Act 模式">模式：Act（点击切 Plan）</button>
+        <label class="swm-check"><input type="checkbox" id="ssm-policy-trust" /> 信任模式（危险操作免确认）</label>
+        <span class="ssm-hint">信任模式与工具模式为全局设置，影响所有标签页（各标签可在发送框上方单独覆盖）</span>
+        <span class="ssm-hint">Plan 模式：AI 只读规划，写/执行操作会被阻止；Act 模式：正常执行，危险操作需确认</span>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">通知</span>
+        <label class="swm-check"><input type="checkbox" id="ssm-set-notify" /> AI 完成时通知（窗口未聚焦时）</label>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">本地 OpenAI 兼容 API</span>
+        <label class="swm-check"><input type="checkbox" id="ssm-set-apiserver" /> 启用（把各窗口网页 AI 暴露为本地接口）</label>
+        <div class="swm-row"><span class="ssm-hint">端口</span><input id="ssm-set-apiserver-port" type="number" min="1" max="65535" value="8788" class="swm-input ssm-num" /></div>
+        <span id="ssm-apiserver-status" class="ssm-hint">未启用</span>
+        <span class="ssm-hint">启用后可用 GET /v1/models 与 POST /v1/chat/completions（Base URL: http://127.0.0.1:端口/v1）</span>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">失败自动重试</span>
+        <label class="swm-check"><input type="checkbox" id="ssm-set-retry" /> 请求失败自动重发（网络错误/429）</label>
+        <div class="swm-row">
+          <span class="ssm-hint">普通失败上限</span>
+          <input id="ssm-set-retry-count" type="number" min="-1" max="100" value="10" class="swm-input ssm-num" />
+          <span class="ssm-hint">次</span>
+        </div>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">工具循环看门狗</span>
+        <div class="swm-row">
+          <span class="ssm-hint">等待超时</span>
+          <input id="ssm-set-wd-timeout" type="number" min="0" max="1800" value="300" class="swm-input ssm-num" />
+          <span class="ssm-hint">秒</span>
+        </div>
+        <span class="ssm-hint">AI 进入工具循环后，超时未回复则发「请继续」催促（0=禁用）</span>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">生命监护</span>
+        <label class="swm-check"><input type="checkbox" id="ssm-set-guard" /> 启用（AI 停顿自动唤醒）</label>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">自进化飞轮</span>
+        <label class="swm-check"><input type="checkbox" id="ssm-set-evolution" /> 启用（含引导者 / 自驱循环 / 自动进化）</label>
+        <span class="ssm-hint">关闭后，以下三个无人干预进程全部停止：引导者（战略巡检）、自驱循环驱动器、自动进化调度器。默认关闭。</span>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">引导者（战略巡检）</span>
+        <label class="swm-check"><input type="checkbox" id="ssm-set-curator" /> 启用（系统空闲时自动发起战略思考）</label>
+        <div class="swm-row">
+          <span class="ssm-hint">空闲满</span>
+          <input id="ssm-set-curator-idle" type="number" min="1" max="1440" value="30" class="swm-input ssm-num" />
+          <span class="ssm-hint">分钟后触发（分钟）</span>
+        </div>
+        <div class="swm-row">
+          <span class="ssm-hint">两次巡检最小间隔</span>
+          <input id="ssm-set-curator-gap" type="number" min="1" max="1440" value="60" class="swm-input ssm-num" />
+          <span class="ssm-hint">分钟</span>
+        </div>
+        <div class="swm-row">
+          <span class="ssm-hint">建议目标数</span>
+          <input id="ssm-set-curator-props" type="number" min="1" max="10" value="3" class="swm-input ssm-num" />
+          <span class="ssm-hint">个</span>
+        </div>
+        <span class="swm-label">采集信号：</span>
+        <div class="swm-row">
+          <label class="swm-check"><input type="checkbox" id="ssm-cur-col-git" /> Git</label>
+          <label class="swm-check"><input type="checkbox" id="ssm-cur-col-todos" /> TODO</label>
+          <label class="swm-check"><input type="checkbox" id="ssm-cur-col-lessons" /> 教训</label>
+          <label class="swm-check"><input type="checkbox" id="ssm-cur-col-skills" /> 技能</label>
+          <label class="swm-check"><input type="checkbox" id="ssm-cur-col-goals" /> 历史目标</label>
+        </div>
+        <textarea id="ssm-set-curator-prompt" class="ssm-textarea" rows="2" placeholder="附加指令（可选）：追加到巡检简报末尾，引导 AI 的思考方向"></textarea>
+        <div class="swm-actions">
+          <button id="ssm-btn-curator-now" class="swm-btn" title="立即发起一次战略巡检（不等空闲）">立即巡检一次</button>
+        </div>
+        <span id="ssm-curator-hint" class="ssm-hint"></span>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">定时任务</span>
+        <span class="ssm-hint">到点向指定窗口注入一段 prompt（默认主窗口；留空 = 主窗口）</span>
+        <div id="ssm-st-list" class="ssm-st-list"></div>
+        <div class="swm-row">
+          <input id="ssm-st-name" type="text" class="swm-input" placeholder="任务名称" />
+        </div>
+        <textarea id="ssm-st-prompt" class="ssm-textarea" rows="2" placeholder="到点注入的 prompt 内容"></textarea>
+        <div class="swm-row">
+          <span class="ssm-hint">类型</span>
+          <select id="ssm-st-type" class="swm-input">
+            <option value="once">一次性（到点执行一次）</option>
+            <option value="interval">周期性（按间隔重复）</option>
+          </select>
+        </div>
+        <div class="swm-row" id="ssm-st-once-row">
+          <span class="ssm-hint">执行时间</span>
+          <input id="ssm-st-at" type="datetime-local" class="swm-input" />
+        </div>
+        <div class="swm-row" id="ssm-st-interval-row">
+          <span class="ssm-hint">间隔</span>
+          <input id="ssm-st-interval" type="number" min="1" max="10080" value="30" class="swm-input ssm-num" />
+          <span class="ssm-hint">分钟</span>
+        </div>
+        <div class="swm-row">
+          <span class="ssm-hint">目标窗口</span>
+          <select id="ssm-st-profile" class="swm-input">
+            <option value="">主窗口（默认）</option>
+          </select>
+        </div>
+        <div class="swm-actions">
+          <button id="ssm-btn-st-create" class="swm-btn" title="创建定时任务">创建任务</button>
+        </div>
+        <span id="ssm-st-hint" class="ssm-hint"></span>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">沉浸式交流</span>
+        <button id="ssm-btn-immersive" class="swm-btn" title="切换为沉浸式交流模式">沉浸式交流</button>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">磁盘清理</span>
+        <div id="ssm-disk-usage" class="ssm-hint">点击下方按钮查看占用</div>
+        <div class="swm-actions">
+          <button id="ssm-btn-cleanup-cache" class="swm-btn" title="删除浏览器缓存（保留登录态，需先关闭对应窗口）">清理缓存</button>
+          <button id="ssm-btn-cleanup-all" class="swm-btn" title="清理孤儿数据：已删窗口残留 + 旧截图 + 日志">全量清理</button>
+        </div>
+      </div>
+
+      <div class="swm-section">
+        <span class="swm-label">关于</span>
+        <div class="swm-row">
+          <span class="ssm-hint">当前版本</span>
+          <span id="ssm-about-version" class="ssm-hint">—</span>
+        </div>
+        <div class="swm-actions">
+          <button id="ssm-btn-changelog" class="swm-btn" title="查看更新日志（多版本）">更新日志</button>
+          <button id="ssm-btn-about" class="swm-btn" title="关于 TokFree">关于</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="process-capsule.js"></script>
+<script src="agent-view.js"></script>
+<script src="shell.js"></script>
+</body>
+</html>

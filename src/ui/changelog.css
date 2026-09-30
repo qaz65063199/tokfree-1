@@ -1,0 +1,163 @@
+/* 更新日志弹窗样式：复用 design-tokens.css 的紫罗兰主题变量 */
+html, body.cc { height: 100%; }
+body.cc {
+  margin: 0;
+  background: var(--cc-bg);
+  color: var(--cc-text);
+  font-family: var(--cc-font);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cl-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--cc-sp-4) var(--cc-sp-5);
+  border-bottom: 1px solid var(--cc-border);
+  background: var(--cc-bg-elevated);
+  flex: none;
+}
+.cl-title { display: flex; align-items: baseline; gap: var(--cc-sp-3); }
+.cl-logo {
+  font-size: 20px;
+  font-weight: 700;
+  background: var(--cc-brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
+}
+.cl-sub { font-size: 13px; color: var(--cc-text-dim); }
+
+.cl-close {
+  border: none;
+  background: transparent;
+  color: var(--cc-text-dim);
+  font-size: 15px;
+  cursor: pointer;
+  padding: var(--cc-sp-2) var(--cc-sp-3);
+  border-radius: var(--cc-r-sm);
+  transition: background var(--cc-dur-fast) var(--cc-ease), color var(--cc-dur-fast) var(--cc-ease);
+}
+.cl-close:hover { background: var(--cc-surface-hover); color: var(--cc-text-strong); }
+
+/* 版本标签栏 */
+.cl-tabs {
+  display: flex;
+  gap: var(--cc-sp-2);
+  padding: var(--cc-sp-3) var(--cc-sp-5);
+  overflow-x: auto;
+  flex: none;
+  border-bottom: 1px solid var(--cc-border);
+  background: var(--cc-bg);
+  scrollbar-width: thin;
+}
+/* 横向滚动条美化：细紫色条（Webkit） */
+.cl-tabs::-webkit-scrollbar { height: 6px; }
+.cl-tabs::-webkit-scrollbar-track { background: transparent; }
+.cl-tabs::-webkit-scrollbar-thumb { background: var(--cc-brand, #7c6cff); border-radius: 3px; }
+.cl-tabs::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
+.cl-tab {
+  flex: none;
+  border: 1px solid var(--cc-border);
+  background: var(--cc-surface);
+  color: var(--cc-text-dim);
+  font-size: 13px;
+  font-family: var(--cc-mono);
+  padding: 6px 14px;
+  border-radius: var(--cc-r-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--cc-dur-fast) var(--cc-ease);
+}
+.cl-tab:hover { background: var(--cc-surface-hover); color: var(--cc-text); }
+.cl-tab.active {
+  background: var(--cc-brand-gradient);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: var(--cc-glow-brand);
+}
+.cl-tab .cl-latest-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cc-success);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.cl-tab.active .cl-latest-dot { background: #fff; }
+
+/* 内容区 */
+.cl-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--cc-sp-5);
+}
+/* 内容区纵向滚动条美化：细紫色条（Webkit） */
+.cl-content::-webkit-scrollbar { width: 6px; }
+.cl-content::-webkit-scrollbar-track { background: transparent; }
+.cl-content::-webkit-scrollbar-thumb { background: var(--cc-brand, #7c6cff); border-radius: 3px; }
+.cl-content::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
+.cl-loading, .cl-empty {
+  color: var(--cc-text-dim);
+  font-size: 14px;
+  padding: var(--cc-sp-5);
+  text-align: center;
+}
+
+.cl-version-card {
+  background: var(--cc-bg-elevated);
+  border: 1px solid var(--cc-border);
+  border-radius: var(--cc-r-lg);
+  padding: var(--cc-sp-5);
+  box-shadow: var(--cc-shadow-sm);
+}
+.cl-version-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--cc-sp-3);
+  margin-bottom: var(--cc-sp-4);
+  padding-bottom: var(--cc-sp-3);
+  border-bottom: 1px solid var(--cc-border);
+}
+.cl-version-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cc-text-strong);
+  font-family: var(--cc-mono);
+}
+.cl-version-date { font-size: 13px; color: var(--cc-text-dim); }
+
+/* body 渲染（Markdown 简渲染产物） */
+.cl-body h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cc-brand);
+  margin: var(--cc-sp-4) 0 var(--cc-sp-2);
+  letter-spacing: 0.3px;
+}
+.cl-body h3:first-child { margin-top: 0; }
+.cl-body ul {
+  margin: 0 0 var(--cc-sp-3);
+  padding-left: var(--cc-sp-5);
+}
+.cl-body li {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--cc-text);
+  margin-bottom: 4px;
+}
+.cl-body strong { color: var(--cc-text-strong); font-weight: 600; }
+.cl-body p { font-size: 14px; line-height: 1.7; color: var(--cc-text); margin: 0 0 var(--cc-sp-2); }
+.cl-body code {
+  font-family: var(--cc-mono);
+  font-size: 12.5px;
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--cc-text-strong);
+}

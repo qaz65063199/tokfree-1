@@ -1,0 +1,38 @@
+/**
+ * TokFree — 多主题（Multi-Theme）
+ * 用法：给 <html> 设置 data-brand 属性，覆盖 :root 中的品牌色令牌。
+ * 默认主题 violet 与 design-tokens.css 的 :root 品牌色保持一致。
+ * 每个主题仅覆盖品牌色四个变量：--cc-brand / --cc-brand-strong / --cc-brand-rgb / --cc-brand-soft。
+ */
+
+/* 紫罗兰（默认） */
+[data-brand="violet"] {
+  --cc-brand: #7c6cff;
+  --cc-brand-strong: #6a58ff;
+  --cc-brand-rgb: 124, 108, 255;
+  --cc-brand-soft: rgba(124, 108, 255, 0.12);
+}
+
+/* 深海蓝 */
+[data-brand="ocean"] {
+  --cc-brand: #3b82f6;
+  --cc-brand-strong: #2563eb;
+  --cc-brand-rgb: 59, 130, 246;
+  --cc-brand-soft: rgba(59, 130, 246, 0.12);
+}
+
+/* 森绿 */
+[data-brand="forest"] {
+  --cc-brand: #10b981;
+  --cc-brand-strong: #059669;
+  --cc-brand-rgb: 16, 185, 129;
+  --cc-brand-soft: rgba(16, 185, 129, 0.12);
+}
+
+/* 暖橙 */
+[data-brand="sunset"] {
+  --cc-brand: #f97316;
+  --cc-brand-strong: #ea580c;
+  --cc-brand-rgb: 249, 115, 22;
+  --cc-brand-soft: rgba(249, 115, 22, 0.12);
+}

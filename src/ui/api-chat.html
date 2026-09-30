@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API 聊天</title>
+<link rel="stylesheet" href="./design-tokens.css">
+<style>
+  html, body { height: 100%; }
+  body.cc { display: flex; flex-direction: column; overflow: hidden; }
+  #api-chat-app { display: flex; flex-direction: column; height: 100vh; }
+  #api-chat-config {
+    flex: 0 0 auto; display: flex; flex-wrap: wrap; gap: var(--cc-sp-2); align-items: center;
+    padding: var(--cc-sp-3) var(--cc-sp-4); border-bottom: 1px solid var(--cc-border);
+    background: var(--cc-bg-elevated);
+  }
+  #api-chat-config label { display: flex; align-items: center; gap: var(--cc-sp-1); font-size: 12px; color: var(--cc-text-dim); }
+  #api-chat-config input[type="text"], #api-chat-config input[type="password"], #api-chat-config select {
+    background: var(--cc-surface); border: 1px solid var(--cc-border); border-radius: var(--cc-r-sm);
+    color: var(--cc-text); padding: 4px 8px; font-size: 12px; font-family: var(--cc-font); outline: none;
+  }
+  #api-chat-config input:focus, #api-chat-config select:focus { border-color: var(--cc-brand); }
+  #api-chat-base-url { width: 220px; }
+  #api-chat-auth-key { width: 160px; }
+  #api-chat-model { width: 150px; }
+  #api-chat-messages {
+    flex: 1 1 auto; overflow-y: auto; padding: var(--cc-sp-4);
+    display: flex; flex-direction: column; gap: var(--cc-sp-3);
+  }
+  .api-empty { color: var(--cc-text-faint); font-size: 13px; text-align: center; margin: auto; }
+  .api-msg {
+    max-width: 780px; width: fit-content; border-radius: var(--cc-r-md);
+    padding: var(--cc-sp-3) var(--cc-sp-4); font-size: 14px; line-height: 1.6; word-break: break-word;
+  }
+  .api-msg-user { align-self: flex-end; background: var(--cc-brand-soft); border: 1px solid var(--cc-border); }
+  .api-msg-assistant { align-self: flex-start; background: var(--cc-surface); border: 1px solid var(--cc-border); }
+  .api-msg .markdown { white-space: normal; }
+  .api-msg .markdown pre {
+    background: rgba(0, 0, 0, 0.35); border: 1px solid var(--cc-border); border-radius: var(--cc-r-sm);
+    padding: var(--cc-sp-3); overflow-x: auto; margin: var(--cc-sp-2) 0;
+  }
+  .api-msg .markdown code { font-family: var(--cc-mono); font-size: 12.5px; }
+  .api-msg .markdown img { max-width: 100%; border-radius: var(--cc-r-sm); }
+  #api-chat-composer {
+    flex: 0 0 auto; display: flex; gap: var(--cc-sp-2); align-items: flex-end;
+    padding: var(--cc-sp-3) var(--cc-sp-4); border-top: 1px solid var(--cc-border);
+    background: var(--cc-bg-elevated);
+  }
+  #api-chat-input {
+    flex: 1 1 auto; min-height: 44px; max-height: 160px; resize: vertical;
+    background: var(--cc-surface); border: 1px solid var(--cc-border); border-radius: var(--cc-r-sm);
+    color: var(--cc-text); padding: var(--cc-sp-2) var(--cc-sp-3); font-family: var(--cc-font);
+    font-size: 14px; outline: none;
+  }
+  #api-chat-input:focus { border-color: var(--cc-brand); }
+  #api-chat-send {
+    flex: 0 0 auto; height: 44px; padding: 0 var(--cc-sp-5); border: none; border-radius: var(--cc-r-sm);
+    background: var(--cc-brand-gradient); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  #api-chat-send:active { transform: translateY(1px); }
+  #api-chat-status { flex: 0 0 auto; font-size: 12px; color: var(--cc-text-dim); align-self: center; min-width: 40px; }
+</style>
+</head>
+<body class="cc">
+  <div id="api-chat-app">
+    <header id="api-chat-config">
+      <label>Base URL <input id="api-chat-base-url" type="text" spellcheck="false"></label>
+      <label>AuthKey <input id="api-chat-auth-key" type="password" spellcheck="false"></label>
+      <label>模型 <select id="api-chat-model"></select></label>
+      <label><input id="api-chat-image-toggle" type="checkbox"> 生图模式</label>
+    </header>
+    <main id="api-chat-messages">
+      <div class="api-empty">在下方输入内容开始对话；后端不可用时会在此显示可读错误。</div>
+    </main>
+    <footer id="api-chat-composer">
+      <textarea id="api-chat-input" placeholder="输入消息，Ctrl+Enter 发送"></textarea>
+      <button id="api-chat-send" type="button">发送</button>
+      <span id="api-chat-status" data-generating="false">空闲</span>
+    </footer>
+  </div>
+  <script src="./api-chat.js"></script>
+</body>
+</html>
